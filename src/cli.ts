@@ -6,6 +6,7 @@ import { analyze } from './analyzer.js';
 import { toJson } from './reporters/json-reporter.js';
 import { toMarkdown } from './reporters/markdown-reporter.js';
 import { toHtml } from './reporters/html-reporter.js';
+import { toConsole } from './reporters/console-reporter.js';
 import { createLogger } from './utils/logger.js';
 
 const argv = await yargs(hideBin(process.argv))
@@ -24,8 +25,8 @@ const argv = await yargs(hideBin(process.argv))
   .option('format', {
     alias: 'f',
     describe: 'Output format',
-    choices: ['json', 'markdown', 'html'] as const,
-    default: 'json' as const,
+    choices: ['table', 'json', 'markdown', 'html'] as const,
+    default: 'table' as const,
   })
   .option('output', {
     alias: 'o',
@@ -111,16 +112,21 @@ async function main() {
       logger,
     );
 
+    const filterOpts = {
+      unusedOnly: argv['unused-only'] as boolean,
+      usedOnly: argv['used-only'] as boolean,
+      summaryOnly: argv.summary,
+      sort: argv.sort,
+      minRefs: argv['min-refs'] as number | undefined,
+    };
+
     let output: string;
     switch (argv.format) {
+      case 'table':
+        output = toConsole(result, filterOpts);
+        break;
       case 'markdown':
-        output = toMarkdown(result, {
-          unusedOnly: argv['unused-only'] as boolean,
-          usedOnly: argv['used-only'] as boolean,
-          summaryOnly: argv.summary,
-          sort: argv.sort,
-          minRefs: argv['min-refs'] as number | undefined,
-        });
+        output = toMarkdown(result, filterOpts);
         break;
       case 'html':
         output = toHtml(result);
