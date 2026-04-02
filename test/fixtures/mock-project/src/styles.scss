@@ -1,0 +1,6 @@
+@use '@mock-scope/utils' as utils;
+@import '@mock-scope/components/theming';
+
+.container {
+  color: red;
+}

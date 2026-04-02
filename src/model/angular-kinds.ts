@@ -1,0 +1,16 @@
+export enum AngularSymbolKind {
+  Component = 'component',
+  Directive = 'directive',
+  Pipe = 'pipe',
+  Service = 'service',
+  NgModule = 'ngmodule',
+  Guard = 'guard',
+  Interceptor = 'interceptor',
+  Token = 'injection-token',
+  Function = 'function',
+  Class = 'class',
+  Interface = 'interface',
+  TypeAlias = 'type',
+  Enum = 'enum',
+  Constant = 'constant',
+}
