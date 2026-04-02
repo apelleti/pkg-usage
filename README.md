@@ -40,22 +40,6 @@ npx pkg-usage rxjs --deep
 npx pkg-usage @trpc/server -p ./apps/api/tsconfig.json
 ```
 
-## Output formats
-
-### Markdown
-
-![CLI Markdown](assets/cli-demo.png)
-
-### Unused audit
-
-![CLI Unused Only](assets/cli-unused.png)
-
-### Interactive HTML report
-
-Single-file HTML with donut chart, filters, search, expandable details, and JSON export.
-
-![HTML Report](assets/html-report.png)
-
 ## Options
 
 ```
