@@ -65,34 +65,37 @@ export function toConsole(
       );
       lines.push('');
 
-      // Used
-      if (!options.unusedOnly && usedSymbols.length > 0) {
-        const rows = usedSymbols.sort(sortFn).map((s) => [
-          s.name,
-          s.kind,
-          String(s.usage?.referenceCount ?? 0),
-          String(s.usage?.importedIn.length ?? 0),
-        ]);
-        lines.push(
-          renderTable(
-            ['Symbol', 'Kind', 'Refs', 'Files'],
-            rows,
-            chalk.green('▌'),
-          ),
-        );
-        lines.push('');
+      // Single table: used first (green), then unused (red)
+      const showUsed = !options.unusedOnly;
+      const showUnused = !options.usedOnly;
+
+      const allRows: { cells: string[]; gutter: string }[] = [];
+
+      if (showUsed) {
+        for (const s of usedSymbols.sort(sortFn)) {
+          allRows.push({
+            cells: [
+              s.name,
+              s.kind,
+              String(s.usage?.referenceCount ?? 0),
+              String(s.usage?.importedIn.length ?? 0),
+            ],
+            gutter: chalk.green('▌'),
+          });
+        }
       }
 
-      // Unused
-      if (!options.usedOnly && unusedSymbols.length > 0) {
-        const rows = unusedSymbols.sort(sortFn).map((s) => [s.name, s.kind]);
-        lines.push(
-          renderTable(
-            ['Symbol', 'Kind'],
-            rows,
-            chalk.red('▌'),
-          ),
-        );
+      if (showUnused) {
+        for (const s of unusedSymbols.sort(sortFn)) {
+          allRows.push({
+            cells: [s.name, s.kind, chalk.dim('–'), chalk.dim('–')],
+            gutter: chalk.red('▌'),
+          });
+        }
+      }
+
+      if (allRows.length > 0) {
+        lines.push(renderMixedTable(['Symbol', 'Kind', 'Refs', 'Files'], allRows));
         lines.push('');
       }
     }
@@ -101,32 +104,37 @@ export function toConsole(
   return lines.join('\n');
 }
 
-function renderTable(
+function renderMixedTable(
   headers: string[],
-  rows: string[][],
-  gutter: string,
+  rows: { cells: string[]; gutter: string }[],
 ): string {
   const colCount = headers.length;
   const widths = headers.map((h) => h.length);
   for (const row of rows) {
     for (let i = 0; i < colCount; i++) {
-      widths[i] = Math.max(widths[i], (row[i] ?? '').length);
+      // Strip ANSI codes for width calculation
+      const plain = (row.cells[i] ?? '').replace(/\x1b\[[0-9;]*m/g, '');
+      widths[i] = Math.max(widths[i], plain.length);
     }
   }
 
+  const g = chalk.dim('▌');
   const headerLine =
-    `  ${gutter} ` +
+    `  ${g} ` +
     headers.map((h, i) => chalk.dim(h.padEnd(widths[i]))).join(chalk.dim('  '));
 
   const separator =
-    `  ${gutter} ` +
+    `  ${g} ` +
     widths.map((w) => chalk.dim('─'.repeat(w))).join(chalk.dim('──'));
 
-  const dataLines = rows.map(
-    (row) =>
-      `  ${gutter} ` +
-      row.map((cell, i) => cell.padEnd(widths[i])).join('  '),
-  );
+  const dataLines = rows.map((row) => {
+    const cells = row.cells.map((cell, i) => {
+      const plain = cell.replace(/\x1b\[[0-9;]*m/g, '');
+      const pad = widths[i] - plain.length;
+      return cell + ' '.repeat(Math.max(0, pad));
+    });
+    return `  ${row.gutter} ` + cells.join('  ');
+  });
 
   return [headerLine, separator, ...dataLines].join('\n');
 }
