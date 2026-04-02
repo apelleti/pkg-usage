@@ -39,6 +39,7 @@ export function trackUsages(
   }
 
   // Resolve namespace imports: find X.Foo usages in code
+  // Always resolve when project is available (not just in deep mode)
   if (namespaceImports.length > 0 && project) {
     const resolved = resolveNamespaceUsages(namespaceImports, exportedSymbols, project);
     for (const imp of resolved) {

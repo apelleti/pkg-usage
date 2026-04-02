@@ -47,9 +47,6 @@ export function parseDeclarationFile(
   const exportedDeclarations = sourceFile.getExportedDeclarations();
 
   for (const [name, declarations] of exportedDeclarations) {
-    // Skip default export if it's unnamed
-    if (name === 'default') continue;
-
     const decl = declarations[0];
     if (!decl) continue;
 

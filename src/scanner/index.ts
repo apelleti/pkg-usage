@@ -101,7 +101,7 @@ export function scanUsages(
       options.includeTypes,
       decoratorUsages,
       options.deep,
-      options.deep ? project : undefined,
+      project,
     );
 
     spinner.succeed(

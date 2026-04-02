@@ -82,6 +82,20 @@ export function collectImports(
         });
       }
 
+      // Default import: import X from 'pkg'
+      const defaultImport = importDecl.getDefaultImport();
+      if (defaultImport) {
+        collected.push({
+          symbolName: 'default',
+          moduleSpecifier,
+          filePath,
+          line: defaultImport.getStartLineNumber(),
+          column: 0,
+          isTypeOnly,
+          isReExport: false,
+        });
+      }
+
       // Namespace import: import * as X from 'pkg'
       const namespaceImport = importDecl.getNamespaceImport();
       if (namespaceImport) {
