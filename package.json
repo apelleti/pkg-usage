@@ -18,6 +18,7 @@
   "bin": {
     "pkg-usage": "./dist/cli.js"
   },
+  "packageManager": "pnpm@10.13.1",
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
