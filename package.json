@@ -1,6 +1,6 @@
 {
   "name": "@ttwtf/pkg-usage",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Analyze which public exports of an npm package/scope are actually used in your project",
   "type": "module",
   "main": "./dist/index.js",
@@ -36,6 +36,10 @@
     "imports"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apelleti/pkg-usage"
+  },
   "dependencies": {
     "chalk": "^5.3.0",
     "ora": "^8.1.0",
