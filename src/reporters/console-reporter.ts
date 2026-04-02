@@ -43,7 +43,18 @@ export function toConsole(
   }
 
   for (const pkg of result.packages) {
-    for (const ep of pkg.entryPoints) {
+    // Sort entry points: those with used symbols first, by usage ratio descending
+    const sortedEntryPoints = [...pkg.entryPoints].sort((a, b) => {
+      const aUsed = a.symbols.filter((s) => s.used).length;
+      const bUsed = b.symbols.filter((s) => s.used).length;
+      if (aUsed > 0 && bUsed === 0) return -1;
+      if (aUsed === 0 && bUsed > 0) return 1;
+      const aRatio = a.symbols.length > 0 ? aUsed / a.symbols.length : 0;
+      const bRatio = b.symbols.length > 0 ? bUsed / b.symbols.length : 0;
+      return bRatio - aRatio;
+    });
+
+    for (const ep of sortedEntryPoints) {
       const total = ep.symbols.length;
       const usedCount = ep.symbols.filter((s) => s.used).length;
       const ratio = total > 0 ? usedCount / total : 0;
